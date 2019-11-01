@@ -1,32 +1,27 @@
 <template lang="html">
   <div>
+    <h1>Cart</h1>
     <table id="shopping-list">
       <thead>
         <tr>
-          <th colspan="1">Cart</th>
+          <th>Name</th><th>Quantity</th><th>(Standard)Price(USD)</th><th>Sub-total(USD)</th><th colspan="3">操作</th>
         </tr>
-        <tr>
-          <th>Name</th><th>Quantity</th><th>Price</th><th>Sub-total</th><th>操作</th>
-        </tr>
-      </thead>
+      </thead>  
       <tbody>
-        <tr v-for="(item,index) in list">
-          <td>{{item.name}}</td><td>{{item.qty}}</td><td>{{item.price}}</td><td>{{item.price * item.qty}}</td>
-          <td @click="delGoods(index)" class="del-goods">删除</td>
+        <tr v-for="(item,index) in list" align="right">
+          <td align="left">{{item.name}}</td><td align="center">{{item.qty}}</td><td>{{item.price}}</td><td>{{item.price * item.qty}}</td>
+          <td @click="addGoods(item, index)" class="del-goods">添加</td>
+          <td @click="reduceGoods(item, index)" class="del-goods">减少</td>
+          <td @click="delGoods(item, index)" class="del-goods">删除</td>
         </tr>
       </tbody>
       <tfoot>
-        <tr>
-          <td colspan="3">Total</td><td>{{totalPrice}}(USD{{counts}})</td>
+        <tr align="right">
+          <td colspan="3">Total</td><td>{{totalPrice}}(USD)</td>
         </tr>
       </tfoot>
     </table>
-    <div class="goods-list">
-      <h3>商品列表</h3>
-      <ul>
-        <li v-for="(item,index) in goods">{{item.name}}  {{item.price}} <a @click="addGoods(index)">加入购物车</a> </li>
-      </ul>
-    </div>
+    
   </div>
 </template>
 
@@ -43,34 +38,36 @@ export default {
         { id: 5, name: "Orange Juice", category: "Drink", qty: 1, price: 15 },
         { id: 6, name: "Potato Chips", category: "Snack", qty: 1, price: 8 },
       ],
-      goods:[
-        {name:"Chicken Wing",price:10},
-        {name:"Pizza",price:50},
-        {name:"Hamburger",price:12},
-        {name:"Coca Cola",price:5},
-        {name:"Orange Juice",price:15},
-        {name:"Potato Chips",price:8 }
-      ]
     }
   },
   computed:{
     totalPrice(){
       var num = 0;
       for (var i = 0; i < this.list.length; i++) {
-        num += this.list[i].price;
+        num += this.list[i].price * this.list[i].qty;
       }
       return num.toFixed(1);
     },
-    counts(){
-      return this.list.length;
-    }
   },
   methods:{
-    delGoods(index){
-      this.list.splice(index,1);
+    // 減少商品
+    reduceGoods(item, index){
+      var newItem = item;
+      if(newItem.qty === 0) {
+        return;
+      }
+      newItem.qty -= 1;
+      this.list.splice(index, 1, newItem); 
     },
-    addGoods(index){
-      this.list.push(this.goods[index]);
+    // 添加商品
+    addGoods(item, index){
+      var newItem = item;
+      newItem.qty += 1;
+      this.list.splice(index, 1, newItem); 
+    },
+    // 删除商品
+    delGoods(item, index) {
+      this.list.splice(index, 1);
     }
   }
 }
